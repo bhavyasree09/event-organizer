@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Registration</title>
+  <style>
+    body {
+      font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+      background: #F5F5DC;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background-image: url('background.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      position: relative;
+    }
+    form {
+      background:  #F5F5DC;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 300px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 10px;
+      background-color: #000080;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #030350;
+    }
+  </style>
+</head>
+<body>
+  
+<form id="registerForm">
+  <h1>Register</h1>
+  <label for="username">Username:</label>
+  <input type="text" id="username" required />
+  
+  <br>
+  <label for="password">Password:</label>
+  <input type="password" id="password" required />
+  
+  <br>
+  <label for="role">Role:</label>
+  <select id="role" required>
+    <option value="">Select Role</option>
+    <option value="student">Student</option>
+    <option value="teacher">Teacher</option>
+  </select>
+  <p>Already have an account? <a href="login.html">Login</a></p>
+  <br>
+  <button type="submit">Register</button>
+</form>
+
+
+
+<script>
+  // Save user to localStorage
+  function saveToLocalStorage(users) {
+    localStorage.setItem('userDatabase', JSON.stringify(users));
+  }
+
+  // Get users from localStorage
+  function getFromLocalStorage() {
+    return JSON.parse(localStorage.getItem('userDatabase')) || [];
+  }
+
+  // Handle form submit
+  document.getElementById('registerForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    const role = document.getElementById('role').value;
+
+    const users = getFromLocalStorage();
+    
+    // Check if user already exists
+    const userExists = users.some(user => user.username === username);
+    if (userExists) {
+      alert('User already exists!');
+      return;
+    }
+
+    // Save new user to localStorage
+    users.push({ username, password, role });
+    saveToLocalStorage(users);
+    alert('Registration successful!');
+    window.location.href = 'login.html';  // Redirect to login page after successful registration
+  });
+</script>
+</body>
+</html>
