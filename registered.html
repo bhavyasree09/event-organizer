@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Registered Events</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="background: #F5F5DC; font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">
+
+  <!-- Include dashboard -->
+  <header>
+    <h1>Student Dashboard</h1>
+    <div class="nav-buttons">
+      <button onclick="window.location.href='dashboard.html'">Home</button>
+      <button onclick="window.location.href='about.html'">About Us</button>
+      <button onclick="window.location.href='registered.html'">Registered Events</button>
+      <button onclick="logout()">Log Out</button>
+    </div>
+  </header>
+
+  <main style="padding: 40px;" id="registeredEventsContainer">
+    <!-- Registered events will be loaded here -->
+  </main>
+
+  <script>
+    function logout() {
+      if (confirm("Are you sure you want to log out?")) {
+        window.location.href = "login.html";
+      }
+    }
+
+    // Get the registered events from localStorage
+    const registeredEvents = JSON.parse(localStorage.getItem('registeredEvents')) || [];
+
+    // Get the container where events will be displayed
+    const registeredEventsContainer = document.getElementById('registeredEventsContainer');
+
+    // Check if there are no registered events
+    if (registeredEvents.length === 0) {
+      registeredEventsContainer.innerHTML = "<p style='font-size: 18px; text-align: center; color: gray;'><br>No registered events yet.</p>";
+    } else {
+      // Loop through the events and display them
+      const registeredEvents = JSON.parse(localStorage.getItem('registeredEvents')) || [];
+      registeredEvents.forEach((registration, index) => {
+        const eventDiv = document.createElement('div');
+        eventDiv.style.backgroundColor = 'rgb(246, 236, 185)';
+        eventDiv.style.padding = '15px';
+        eventDiv.style.marginBottom = '15px';
+        eventDiv.style.borderRadius = '10px';
+        eventDiv.style.boxShadow = '0 2px 5px rgba(0,0,0,0.1)';
+        
+        eventDiv.innerHTML = `
+          <h3>${registration.event.title}</h3>
+          <p><strong>Date:</strong> ${registration.event.date || "Not specified"}</p>
+          <p><strong>Venue:</strong> ${registration.event.venue || "Not specified"}</p>
+          
+        `;
+        console.log(`registration ${index}:`, registration);
+        registeredEventsContainer.appendChild(eventDiv);
+      });
+    }
+  </script>
+
+  <style>
+    header {
+      background-color: #000080;
+      color: white;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed; /* Make header fixed at the top */
+      top: 0;
+      left: 0;
+      right: 0;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .nav-buttons button {
+      background-color: white;
+      color: #000080;
+      border: none;
+      align-items: center;
+      padding: 8px 15px;
+      margin-left: 5px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .nav-buttons button:hover {
+      background-color: #d3d3f3;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 36px;
+      margin-bottom: 40px;
+      color: #000080;
+    }
+  </style>
+
+</body>
+</html>

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Teacher Dashboard</title>
+  <style>
+    body {
+      font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+      background: #F5F5DC;
+      margin: 0;
+    }
+
+    header {
+      background-color: #000080;
+      color: white;
+      padding: 20px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      margin: 0;
+    }
+
+    .post-btn {
+      padding: 10px 16px;
+      font-size: 16px;
+      background-color: #000080;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    main {
+      padding: 30px;
+    }
+
+    .post {
+      background-color: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: transform 0.2s;
+      position: relative;
+    }
+
+    .post:hover {
+      transform: scale(1.01);
+    }
+
+    .post h3 {
+      margin-top: 0;
+    }
+
+    .delete-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      font-size: 14px;
+      cursor: pointer;
+      border-radius: 6px;
+    }
+
+    .delete-btn:hover {
+      background-color: #c82333;
+    }
+
+    .registrations {
+      background-color: #fff3cd;
+      border: 1px solid #ffeeba;
+      padding: 20px;
+      margin-top: 10px;
+      border-radius: 10px;
+    }
+
+    .registrations h4 {
+      margin-top: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    table, th, td {
+      border: 1px solid #ccc;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: left;
+    }
+
+    .unregister-btn {
+      background-color: #ff851b;
+      color: white;
+      padding: 6px 12px;
+      font-size: 14px;
+      cursor: pointer;
+      border-radius: 6px;
+      margin-top: 10px;
+    }
+
+    .unregister-btn:hover {
+      background-color: #e67e22;
+    }
+    .no-posts {
+      text-align: center;
+      font-size: 18px;
+      color: #888;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Teacher Dashboard</h1>
+    <button class="post-btn" onclick="window.location.href='post.html'">+ Post</button>
+  </header>
+
+  <main id="postContainer">
+    <!-- Posts will be loaded here -->
+  </main>
+
+  <script>
+    const postContainer = document.getElementById('postContainer');
+  
+    // Use default values if data is not found in localStorage
+    let posts = JSON.parse(localStorage.getItem('posts')) || [];
+    console.log('Posts loaded in teacher-home:', posts); // Debugging log
+    let registrations = JSON.parse(localStorage.getItem('regstudents')) || [];
+  
+    // Function to load posts dynamically
+    function loadPosts() {
+  
+      // If no posts are found, show a message
+      if (posts.length === 0) {
+        postContainer.innerHTML = `<div class="no-posts"><br> <br>No Posts posted. Please post an event.</div>`;
+        return;
+      }
+  
+      posts.forEach((post, index) => {
+        const postDiv = document.createElement('div');
+        postDiv.className = 'post';
+        postDiv.innerHTML = `
+          <h3>${post.title}</h3>
+          <p>${post.message}</p>
+        `;
+  
+        // Add the delete button
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'delete-btn';
+        deleteBtn.innerText = 'Delete';
+        deleteBtn.onclick = function() {
+          deletePost(index, post.title, postDiv);
+        };
+  
+        postDiv.appendChild(deleteBtn);
+        let registered = JSON.parse(localStorage.getItem('newRegistration')) || [];
+        // Display student registrations for each post
+        registered = registrations.filter(r => r.event.title === post.title);  // Match event title in registration object
+        if (registered.length > 0) {
+          const regDiv = document.createElement('div');
+          regDiv.className = 'registrations';
+          regDiv.innerHTML = `<h4>Registered Students (${registered.length}):</h4>`;
+  
+          let table = `<table><tr>
+            <th>Name</th>
+            <th>Roll Number</th>
+            <th>Branch</th>
+            <th>Year</th>
+            <th>Section</th>
+          </tr>`;
+  
+          registered.forEach(s => {
+            table += `<tr>
+              <td>${s.student.name}</td>
+              <td>${s.student.roll}</td>
+              <td>${s.student.branch}</td>
+              <td>${s.student.year}</td>
+              <td>${s.student.section}</td>
+            </tr>`;
+          });
+  
+          table += `</table>`;
+          regDiv.innerHTML += table;
+          postDiv.appendChild(regDiv);
+        } else {
+          const noReg = document.createElement('div');
+          noReg.className = 'registrations';
+          noReg.innerHTML = `<p>No students have registered yet.</p>`;
+          postDiv.appendChild(noReg);
+        }
+  
+        postContainer.appendChild(postDiv);
+      });
+    }
+  
+    // Function to delete a post and associated student registrations
+    function deletePost(indexToDelete, postTitle, postDiv) {
+      if (confirm("Are you sure you want to delete this post?")) {
+        // 1. Remove the post from the posts array
+        posts.splice(indexToDelete, 1);
+        localStorage.setItem('posts', JSON.stringify(posts));
+  
+        // 2. Remove all student registrations for this post
+        registrations = registrations.filter(r => r.event.title !== postTitle);
+        localStorage.setItem('regstudents', JSON.stringify(registrations));
+        localStorage.setItem('registeredEvents', JSON.stringify(registrations));
+  
+        // 3. Immediately update the UI
+        postDiv.remove();  // Remove the post div from the DOM
+      }
+    }
+  
+    // Load posts when the page loads
+    loadPosts();
+  </script>
+  
+</body>
+</html>

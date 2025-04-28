@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Teacher Post Page</title>
+  <style>
+    body {
+      font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+      background: #F5F5DC;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    form {
+      background: rgb(241, 230, 182);
+      padding: 20px;
+      border-radius: 10px;
+      width: 400px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    input, select, textarea, button {
+      width: 100%;
+      margin-top: 5px;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    button {
+      margin-top: 20px;
+      background-color: #000080;
+      color: white;
+      border: none;
+    }
+
+    button:hover {
+      background-color: #030350;
+    }
+
+    .success {
+      color: #000080;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Post to Dashboard</h1>
+
+  <form id="postForm">
+    <label for="title">Event Name</label>
+    <input type="text" id="title" required />
+
+    <label for="message">Description</label>
+    <textarea id="message" rows="4" required></textarea>
+
+    <!-- Image Upload -->
+    <label for="image">Upload Image:</label>
+    <input type="file" id="image" accept="image/*">
+
+    <label for="date">Event Date:</label>
+    <input type="date" id="date" required>
+
+    <label for="venue">Venue</label>
+    <input type="text" id="venue" required>
+
+    <label for="branch">Branch</label>
+    <select id="branch" required>
+        <option value="All">All</option>
+        <option value="Cyber Security">cybersecurity</option>
+        <option value="CSE">CSE</option>
+        <option value="AI-ML">AI-ML</option>
+        <option value="Data Science">Data Science</option>
+    </select>
+
+    <button type="submit">Post</button>
+    <p class="success" id="successMessage" style="display:none;">Post added successfully!</p>
+  </form>
+
+  <script>
+    const form = document.getElementById('postForm');
+    const successMessage = document.getElementById('successMessage');
+
+    function submitPost(event) {
+      event.preventDefault();
+      const title = document.getElementById('title').value;
+      const message = document.getElementById('message').value;
+      const date = document.getElementById('date').value;
+      const venue = document.getElementById('venue').value;
+      const branch = document.getElementById('branch').value;
+      const imageInput = document.getElementById('image');
+      const reader = new FileReader();
+
+      reader.onload = function () {
+        const imageData = reader.result;
+
+        const post = {
+          title,
+          message,
+          date,
+          venue,
+          branch,
+          image: imageData
+        };
+
+        const posts = JSON.parse(localStorage.getItem('posts')) || [];
+        posts.push(post);
+        localStorage.setItem('posts', JSON.stringify(posts));
+        alert("Post added successfully!");
+        window.location.href = 'teacher-home.html';
+      };
+
+      if (imageInput.files.length > 0) {
+        reader.readAsDataURL(imageInput.files[0]);
+      } else {
+        const post = { title, message, date, venue, branch, image: null };
+        const posts = JSON.parse(localStorage.getItem('posts')) || [];
+        posts.push(post);
+        localStorage.setItem('posts', JSON.stringify(posts));
+        alert("Post added successfully!");
+        window.location.href = 'teacher-home.html';
+      }
+    }
+
+    form.addEventListener('submit', submitPost);
+  </script>
+
+</body>
+</html>
