@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Page</title>
+    <style>
+        body {
+          font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+          background: #F5F5DC;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 100vh;
+          margin: 0;
+          padding: 10px;
+        }
+
+        h2 {
+          color: #001f3f;
+          font-size: 36px;
+          margin-bottom: 30px;
+          text-align: center;
+        }
+
+        .container {
+          background-color: rgb(241, 230, 182);
+          padding: 30px;
+          border-radius: 10px;
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+          width: 300px;
+          text-align: center;
+        }
+
+        input, select {
+          width: 100%;
+          padding: 10px;
+          margin-top: 10px;
+          border: 1px solid #ccc;
+          border-radius: 5px;
+          font-size: 14px;
+        }
+
+        button {
+          margin-top: 20px;
+          width: 100%;
+          padding: 10px;
+          background-color: #001f3f;
+          color: white;
+          border: none;
+          border-radius: 5px;
+          font-size: 16px;
+          cursor: pointer;
+        }
+
+        button:hover {
+          background-color: #003366;
+        }
+
+        p {
+          margin-top: 15px;
+          font-size: 14px;
+        }
+
+        a {
+          color: #001f3f;
+          text-decoration: none;
+        }
+
+        a:hover {
+          text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Register</h2>
+
+    <form id="registerForm">
+        <input type="text" id="username" placeholder="Username" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
+
+        <input type="hidden" id="role" value="student">
+
+
+        <button type="submit">Register</button>
+    </form>
+
+    <p>Already have an account? <a href="login.html">Login here</a></p>
+</div>
+
+<script>
+document.getElementById('registerForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+
+  const username = document.getElementById('username').value;
+  const password = document.getElementById('password').value;
+  const confirmPassword = document.getElementById('confirmPassword').value;
+  const role = 'student';
+
+
+  if (password !== confirmPassword) {
+    alert('Passwords do not match');
+    return;
+  }
+
+  fetch('http://localhost:3000/api/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password, role })
+  })
+  .then(res => res.json())
+  .then(data => {
+    alert(data.message);
+    if (data.message === 'Registered successfully') {
+      window.location.href = 'login.html';
+    }
+  })
+  .catch(err => {
+    alert('Registration failed');
+    console.error(err);
+  });
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Teacher Dashboard</title>
+  <style>
+    body {
+      font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+      background: #F5F5DC;
+      margin: 0;
+    }
+
+    header {
+      background-color: #000080;
+      color: white;
+      padding: 20px 30px;
+      display: relative;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      margin: 0;
+    }
+
+    .post-btn {
+      padding: 10px 16px;
+      font-size: 16px;
+      background-color: #000080;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    main {
+      padding: 30px;
+    }
+
+    .post {
+      background-color: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: transform 0.2s;
+      position: relative;
+    }
+
+    .post:hover {
+      transform: scale(1.01);
+    }
+
+    .post h3 {
+      margin-top: 0;
+    }
+
+    .del-btn {
+       padding: 10px 16px;
+      font-size: 16px;
+      background-color: #000080;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .del-btn:hover {
+      transform: scale(1.01);
+    }
+
+    .delete-btn {
+      background-color: #000080;
+      color: white;
+      padding: 8px 12px;
+      font-size: 14px;
+      cursor: pointer;
+      border-radius: 6px;
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
+    .registrations {
+      background-color: #fff3cd;
+      border: 1px solid #ffeeba;
+      padding: 20px;
+      margin-top: 10px;
+      border-radius: 10px;
+    }
+
+    .registrations h4 {
+      margin-top: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    table, th, td {
+      border: 1px solid #ccc;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: left;
+    }
+
+    .unregister-btn {
+      background-color: #ff851b;
+      color: white;
+      padding: 6px 12px;
+      font-size: 14px;
+      cursor: pointer;
+      border-radius: 6px;
+      margin-top: 10px;
+    }
+
+    .unregister-btn:hover {
+      background-color: #e67e22;
+    }
+    .no-posts {
+      text-align: center;
+      font-size: 18px;
+      color: #888;
+      margin-top: 10px;
+    }
+    .logout-btn {
+       padding: 10px 16px;
+      font-size: 16px;
+      background-color: #000080;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+
+    <h1>Teacher Dashboard</h1>
+    
+    <button class="del-btn" onclick="window.location.href='deleted-events.html'">View Deleted Events</button>
+
+    <button class="post-btn" onclick="window.location.href='post.html'">+ Post</button>
+
+    <button class="logout-btn" onclick="logout()">Log Out</button>
+  
+  </header>
+
+  <main id="postContainer">
+    <!-- Posts will be loaded here -->
+  </main>
+
+  <script>
+    enforceLogin();
+    function enforceLogin() {
+  const role = sessionStorage.getItem('role');
+
+  if (!role) {
+    alert('Please login to continue');
+    window.location.href = 'login.html';
+  }
+
+  if (role !== 'teacher') {
+    alert('Access denied');
+    sessionStorage.clear();
+    window.location.href = 'login.html';
+  }
+}
+
+
+
+     function logout() {
+  if (confirm("Are you sure you want to log out?")) {
+    sessionStorage.clear();
+    window.location.href = "index.html";
+  }
+}
+    enforceTeacherAccess();
+    // 🔥 Auto-archive events closed for more than 7 days
+fetch('http://localhost:3000/api/archive-expired-events', {
+  method: 'POST'
+});
+
+//teacher access enforcement
+function enforceTeacherAccess() {
+  const role = sessionStorage.getItem('role');
+
+  if (role !== 'teacher') {
+    alert('Access denied. Teachers only.');
+    sessionStorage.clear();
+    window.location.href = 'index.html';
+  }
+}
+
+const postContainer = document.getElementById('postContainer');
+
+// Load all events posted by teacher
+fetch('http://localhost:3000/api/events')
+  .then(res => res.json())
+  .then(events => {
+    if (!events || events.length === 0) {
+      postContainer.innerHTML = `
+        <div class="no-posts">
+          <br><br>No events posted yet.
+        </div>`;
+      return;
+    }
+
+    events.forEach(event => {
+      const postDiv = document.createElement('div');
+      postDiv.className = 'post';
+
+      const eventDate = new Date(event.date);
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+const isClosed = eventDate < today;
+
+postDiv.innerHTML = `
+  <h3>${event.title}</h3>
+  <p>${event.description}</p>
+  <p><strong>Date:</strong> ${event.date}</p>
+  <p><strong>Venue:</strong> ${event.location}</p>
+
+  ${
+    isClosed
+      ? `<p style="color:red; font-weight:bold;">🚫 EVENT CLOSED</p>`
+      : `<p style="color:green; font-weight:bold;">✅ Open for Registration</p>`
+  }
+
+  <button class="delete-btn">Delete Event</button>
+
+  <div class="registrations">
+    <h4>Registered Students</h4>
+    <p>Loading...</p>
+  </div>
+`;
+
+postDiv.querySelector('.delete-btn').onclick = () => {
+  if (!confirm('Are you sure you want to delete this event?')) return;
+
+  fetch(`http://localhost:3000/api/delete-event/${event._id}`, {
+    method: 'DELETE'
+  })
+  .then(res => res.json())
+  .then(data => {
+    alert(data.message);
+    postDiv.remove(); // remove from UI immediately
+  })
+  .catch(err => {
+    console.error(err);
+    alert('Failed to delete event');
+  });
+};
+
+
+      postContainer.appendChild(postDiv);
+
+      // Fetch registrations for this event
+      fetch(`http://localhost:3000/api/event-registrations/${event._id}`)
+        .then(res => res.json())
+        .then(regs => {
+          const regDiv = postDiv.querySelector('.registrations');
+
+          if (!regs || regs.length === 0) {
+            regDiv.innerHTML = `<p>No students have registered yet.</p>`;
+            return;
+          }
+
+          let table = `
+            <table>
+              <tr>
+                <th>Name</th>
+                <th>Roll</th>
+                <th>Branch</th>
+                <th>Year</th>
+                <th>Section</th>
+              </tr>`;
+
+          regs.forEach(s => {
+            table += `
+              <tr>
+                <td>${s.studentName}</td>
+                <td>${s.roll}</td>
+                <td>${s.branch}</td>
+                <td>${s.year}</td>
+                <td>${s.section}</td>
+              </tr>`;
+          });
+
+          table += `</table>`;
+          regDiv.innerHTML = table;
+        });
+    });
+  })
+  .catch(err => {
+    console.error(err);
+    postContainer.innerHTML = `<p>Error loading events.</p>`;
+  });
+</script>
+
+  
+</body>
+</html>

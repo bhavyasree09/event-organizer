@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Registered Events</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="background: #F5F5DC; font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">
+
+  <!-- Include dashboard -->
+  <header>
+    <h1>Student Dashboard</h1>
+    <div class="nav-buttons">
+      <button onclick="window.location.href='dashboard.html'">Home</button>
+      <button onclick="window.location.href='aboutus.html'">About Us</button>
+      <button onclick="window.location.href='registered.html'">Registered Events</button>
+      <button onclick="logout()">Log Out</button>
+    </div>
+  </header>
+
+  <main style="padding: 40px;">
+    <h2 style="text-align:center; color:#000080;">
+  My Registered Events
+</h2>
+
+  <div id="registeredEventsContainer"></div>
+</main>
+
+
+  <script>
+    enforceLogin();
+    function enforceLogin() {
+  const role = sessionStorage.getItem('role');
+
+  if (!role) {
+    alert('Please login to continue');
+    window.location.href = 'login.html';
+  }
+}
+
+function logout() {
+  if (confirm("Are you sure you want to log out?")) {
+    sessionStorage.clear();
+    window.location.href = "login.html";
+  }
+}
+
+const container = document.getElementById('registeredEventsContainer');
+
+// 🔑 Get roll from session (logged-in student)
+const roll = sessionStorage.getItem('studentRoll');
+
+if (!roll) {
+  alert('Session expired. Please login again.');
+  window.location.href = 'login.html';
+}
+
+// Load registered events automatically
+fetch(`http://localhost:3000/api/my-registrations/${roll}`)
+  .then(res => res.json())
+  .then(data => {
+    container.innerHTML = '';
+
+    if (!data || data.length === 0) {
+      container.innerHTML = `
+        <p style="font-size:18px; text-align:center; color:gray;">
+          No registered events yet.
+        </p>`;
+      return;
+    }
+
+    data.forEach(reg => {
+  if (!reg.eventId) return; // 🔒 skip broken registrations
+  const event = reg.eventId;
+
+      const eventDiv = document.createElement('div');
+      eventDiv.style.backgroundColor = 'rgb(246, 236, 185)';
+      eventDiv.style.padding = '15px';
+      eventDiv.style.marginBottom = '15px';
+      eventDiv.style.borderRadius = '10px';
+      eventDiv.style.boxShadow = '0 2px 5px rgba(0,0,0,0.1)';
+
+      eventDiv.innerHTML = `
+        <h3>${event.title}</h3>
+        <p><strong>Date:</strong> ${event.date}</p>
+        <p><strong>Venue:</strong> ${event.location}</p>
+      `;
+
+      container.appendChild(eventDiv);
+    });
+  })
+  .catch(err => {
+    console.error(err);
+    alert('Failed to load registered events');
+  });
+</script>
+
+
+
+  <style>
+    header {
+      background-color: #000080;
+      color: white;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed; /* Make header fixed at the top */
+      top: 0;
+      left: 0;
+      right: 0;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .nav-buttons button {
+      background-color: white;
+      color: #000080;
+      border: none;
+      align-items: center;
+      padding: 8px 15px;
+      margin-left: 5px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .nav-buttons button:hover {
+      background-color: #d3d3f3;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 36px;
+      margin-bottom: 40px;
+      color: #000080;
+    }
+  </style>
+
+</body>
+</html>

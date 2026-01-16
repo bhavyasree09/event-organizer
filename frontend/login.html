@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <style>
+        body {
+          font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+          background:  #F5F5DC;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          height: 100vh;
+          margin: 0;
+          padding: 10px;
+        }
+        h2 {
+          color: #001f3f;
+          font-size: 36px;
+          margin-bottom: 40px;
+          text-align: center;
+        }
+        .container {
+          background-color:rgb(241, 230, 182); /* Light Beige */
+          padding: 30px;
+          border-radius: 10px;
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+          width: 300px;
+          text-align: center;
+        }
+        label {
+          display: block;
+          margin-top: 10px;
+        }
+        input, select {
+          width: 100%;
+          padding: 10px;
+          margin-top: 10px;
+          border: 1px solid #ccc;
+          border-radius: 5px;
+          font-size: 14px;
+        }
+        button {
+          margin-top: 20px;
+          width: 100%;
+          padding: 10px;
+          background-color: #001f3f; /* Navy Blue */
+          color: white;
+          border: none;
+          border-radius: 5px;
+          font-size: 16px;
+          cursor: pointer;
+        }
+        button:hover {
+          background-color: #003366; /* Darker navy blue on hover */
+        }
+        p {
+          margin-top: 15px;
+          font-size: 14px;
+        }
+        a {
+          color: #001f3f;
+          text-decoration: none;
+        }
+        a:hover {
+          text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Login</h2>
+        <form id="loginForm">
+            <input type="text" id="username" placeholder="Username" required>
+            <input type="password" id="password" placeholder="Password" required><br>
+            <select id="role" required>
+                <option value="">Select Role</option>
+                <option value="student">Student</option>
+                <option value="teacher">Teacher</option>
+            </select>
+            <p>Don't have an account? <a href="reg.html">Register here</a></p>
+            <button type="submit">Login</button>
+        </form>
+        
+    </div>
+    <script>
+      document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const role = document.getElementById('role').value;
+
+     fetch('http://localhost:3000/api/login', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    username: username,
+    password: password,
+    role: role
+  })
+})
+
+.then(res => res.json())
+.then(data => {
+  if (!data.success) {
+    alert('Invalid credentials');
+    window.location.href = 'login.html';
+    return;
+  }
+
+  sessionStorage.setItem('role', data.role);
+
+  if (data.role === 'student') {
+    sessionStorage.setItem('studentRoll', data.username);
+    window.location.href = 'dashboard.html';
+  } else if (data.role === 'teacher') {
+    window.location.href = 'teacher-home.html';
+  }
+});
+ });
+    </script>
+</body>
+</html>

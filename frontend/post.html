@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Teacher Post Page</title>
+  <style>
+    body {
+      font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+      background: #F5F5DC;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    form {
+      background: rgb(241, 230, 182);
+      padding: 20px;
+      border-radius: 10px;
+      width: 400px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    input, select, textarea, button {
+      width: 100%;
+      margin-top: 5px;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    button {
+      margin-top: 20px;
+      background-color: #000080;
+      color: white;
+      border: none;
+    }
+
+    button:hover {
+      background-color: #030350;
+    }
+
+    .success {
+      color: #000080;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Post to Dashboard</h1>
+
+  <form id="postForm">
+    <label for="title">Event Name</label>
+    <input type="text" id="title" required />
+
+    <label for="message">Description</label>
+    <textarea id="message" rows="4" required></textarea>
+
+
+    <label for="date">Event Date:</label>
+    <input type="date" id="date" required>
+
+    <label for="venue">Venue</label>
+    <input type="text" id="venue" required>
+
+    <label for="branch">Branch</label>
+    <select id="branch" required>
+        <option value="All">All</option>
+        <option value="Cyber Security">cybersecurity</option>
+        <option value="CSE">CSE</option>
+        <option value="AI-ML">AI-ML</option>
+        <option value="Data Science">Data Science</option>
+    </select>
+
+    <button type="submit">Post</button>
+    <p class="success" id="successMessage" style="display:none;">Post added successfully!</p>
+  </form>
+
+  <script>
+    enforceLogin();
+    function enforceLogin() {
+  const role = sessionStorage.getItem('role');
+
+  if (!role) {
+    alert('Please login to continue');
+    window.location.href = 'login.html';
+  }
+}
+
+const form = document.getElementById('postForm');
+
+form.addEventListener('submit', function (e) {
+  e.preventDefault();
+
+  const title = document.getElementById('title').value;
+  const message = document.getElementById('message').value;
+  const date = document.getElementById('date').value;
+  const venue = document.getElementById('venue').value;
+  const branch = document.getElementById('branch').value;
+
+  fetch('http://localhost:3000/api/create-event', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      title: title,
+      description: message,
+      date: date,
+      location: venue,
+      branch: branch,
+      createdBy: 'teacher'
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    alert(data.message);
+    window.location.href = 'teacher-home.html';
+  })
+  .catch(err => {
+    console.error(err);
+    alert('Failed to create event');
+  });
+});
+</script>
+
+
+</body>
+</html>

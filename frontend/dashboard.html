@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Student Dashboard</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+      background: #F5F5DC;
+    }
+
+    header {
+      background-color: #000080;
+      color: white;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .nav-buttons button {
+      background-color: white;
+      color: #000080;
+      border: none;
+      padding: 8px 15px;
+      margin-left: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .nav-buttons button:hover {
+      background-color: #d3d3f3;
+    }
+
+    /* Branch selection */
+    .branch-select {
+      font-size: 16px;
+      padding: 6px 12px;
+      border-radius: 5px;
+      border: none;
+    }
+
+    main {
+      padding: 20px 30px;
+    }
+
+    .post {
+      background-color: rgb(246, 236, 185);
+      padding: 10px 15px;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      transition: opacity 0.3s;
+    }
+
+    .post h3 {
+      margin: 0 0 8px 0;
+      font-size: 18px;
+    }
+
+    .post p {
+      color: #000000;
+      font-size: 14px;
+      margin: 2px 0;
+      text-align: left;
+    }
+
+    .post img {
+      max-width: 100%;
+      height: auto;
+      margin-top: 10px;
+    }
+
+    .no-posts {
+      text-align: center;
+      font-size: 18px;
+      color: #888;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Navigation Bar -->
+  <nav>
+    <header>
+      <h1>Student Dashboard</h1>
+      <div class="nav-buttons">
+        <button id="homeBtn">Home</button>
+        <button onclick="window.location.href='aboutus.html'">About Us</button>
+        <button onclick="window.location.href='registered.html'">Registered Events</button>
+        <button onclick="logout()">Log Out</button>
+      </div>
+      <select class="branch-select" id="branchFilter">
+        <option value="All">All Branches</option>
+        <option value="Cyber Security">Cybersecurity</option>
+        <option value="CSE">CSE</option>
+        <option value="AI-ML">AI-ML</option>
+        <option value="Data Science">Data Science</option>
+      </select>
+    </header>
+  </nav>
+
+  <main id="postContainer">
+    <!-- Posts will be loaded here -->
+  </main>
+
+  <script>
+    enforceLogin();
+    function enforceLogin() {
+  const role = sessionStorage.getItem('role');
+
+  if (!role) {
+    alert('Please login to continue');
+    window.location.href = 'login.html';
+  }
+}
+
+    function logout() {
+  if (confirm("Are you sure you want to log out?")) {
+    sessionStorage.clear();
+    window.location.href = "index.html";
+  }
+}
+    const homeButton = document.getElementById('homeBtn');
+
+    // Function to load posts from database
+    const postContainer = document.getElementById('postContainer');
+const branchFilter = document.getElementById('branchFilter');
+
+function loadPosts(branch = 'All') {
+  fetch('http://localhost:3000/api/events')
+    .then(res => res.json())
+    .then(posts => {
+
+      postContainer.innerHTML = '';
+
+      if (posts.length === 0) {
+        postContainer.innerHTML = `<div class="no-posts">No events yet</div>`;
+        return;
+      }
+      
+      posts.forEach(post => {
+
+  const eventDate = new Date(post.date);
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+
+// days since event
+const diffDays = (today - eventDate) / (1000 * 60 * 60 * 24);
+
+// ❌ hide completely if older than 7 days
+if (diffDays > 7) {
+  return; // skip rendering this event
+}
+
+const isClosed = diffDays >= 0;
+
+
+  const postDiv = document.createElement('div');
+  postDiv.className = 'post';
+
+  postDiv.innerHTML = `
+    <h3>${post.title}</h3>
+    <p><strong>Description:</strong> ${post.description}</p>
+    <p><strong>Date:</strong> ${post.date}</p>
+    <p><strong>Venue:</strong> ${post.location}</p>
+    ${
+      isClosed
+        ? `<p style="color:red; font-weight:bold;">🚫 EVENT CLOSED</p>`
+        : `<p style="color:green; font-weight:bold;">✅ Open for Registration</p>`
+    }
+  `;
+
+  if (!isClosed) {
+    // ✅ only clickable if event is open
+    postDiv.style.cursor = 'pointer';
+    postDiv.onclick = () => {
+      window.location.href = `event.html?id=${post._id}`;
+    };
+  } else {
+    // ❌ disable interaction
+    postDiv.style.opacity = '0.6';
+    postDiv.style.cursor = 'not-allowed';
+  }
+
+  postContainer.appendChild(postDiv);
+});
+ });
+}
+
+branchFilter.addEventListener('change', () => {
+  loadPosts(branchFilter.value);
+});
+
+loadPosts();
+  </script>
+
+</body>
+</html>

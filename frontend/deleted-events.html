@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Deleted Events</title>
+  <style>
+    body {
+      font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+      background: #F5F5DC;
+      padding: 30px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #800000;
+    }
+
+    .event {
+      background: rgb(241, 230, 182);
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .deleted {
+      color: #800000;
+      font-weight: bold;
+    }
+
+    .back {
+      margin-bottom: 20px;
+      display: inline-block;
+      text-decoration: none;
+      color: #000080;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <a href="teacher-home.html" class="back">← Back to Dashboard</a>
+
+  <h2>Deleted Events</h2>
+
+  <div id="deletedContainer"></div>
+
+  <script>
+    enforceLogin();
+    function enforceLogin() {
+  const role = sessionStorage.getItem('role');
+
+  if (!role) {
+    alert('Please login to continue');
+    window.location.href = 'login.html';
+  }
+
+  if (role !== 'teacher') {
+    alert('Access denied');
+    sessionStorage.clear();
+    window.location.href = 'login.html';
+  }
+}
+
+
+    enforceTeacherAccess();
+    const container = document.getElementById('deletedContainer');
+//teacher access enforcement
+function enforceTeacherAccess() {
+  const role = sessionStorage.getItem('role');
+
+  if (role !== 'teacher') {
+    alert('Access denied. Teachers only.');
+    sessionStorage.clear();
+    window.location.href = 'index.html';
+  }
+}
+    fetch('http://localhost:3000/api/deleted-events')
+      .then(res => res.json())
+      .then(events => {
+        if (!events || events.length === 0) {
+          container.innerHTML = '<p style="text-align:center;">No deleted events.</p>';
+          return;
+        }
+
+        events.forEach(event => {
+          const div = document.createElement('div');
+          div.className = 'event';
+          div.innerHTML = `
+            <h3>${event.title}</h3>
+            <p>${event.description}</p>
+            <p><strong>Date:</strong> ${event.date}</p>
+            <p><strong>Venue:</strong> ${event.location}</p>
+            <p class="deleted">Deleted on: ${new Date(event.deletedAt).toLocaleString()}</p>
+          `;
+          container.appendChild(div);
+        });
+      })
+      .catch(err => {
+        console.error(err);
+        container.innerHTML = '<p>Error loading deleted events.</p>';
+      });
+  </script>
+
+</body>
+</html>

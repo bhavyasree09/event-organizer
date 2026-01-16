@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>About Us</title>
+  <style>
+    body {
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  background-color: #F5F5DC;
+  margin: 0;
+  padding: 0; /* Remove extra space from body */
+}
+
+header {
+  background-color: #000080;
+  color: white;
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: fixed; /* Make header fixed at the top */
+  top:0;
+  left:0;
+  right:0;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 24px;
+}
+
+
+.nav-buttons button {
+  background-color: white;
+  color: #000080;
+  border: none;
+  align-items: center;
+  padding: 8px 15px;
+  margin-left: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  
+}
+
+.nav-buttons button:hover {
+  background-color: #d3d3f3;
+}
+
+
+
+h1 {
+  text-align: center;
+  font-size: 36px;
+  margin-bottom: 40px;
+  color: #000080;
+}
+
+h2 {
+  font-size: 28px;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Developer section */
+.meet-developers {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.meet-btn {
+  padding: 10px 40px;
+  background-color: #000080;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.meet-btn:hover {
+  background-color: #0056b3;
+}
+
+.dev-dropdown {
+  display: none;
+  margin-top: 20px;
+}
+
+.dev-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.dev-card {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 250px;
+  margin-bottom: 20px;
+}
+
+.dev-container .dev-card:nth-child(-n+3) {
+  flex: 1 1 30%;
+  max-width: 30%;
+}
+
+.dev-container .dev-card:nth-child(n+4) {
+  flex: 1 1 40%;
+  max-width: 40%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.dev-card h3 {
+  font-size: 20px;
+  margin: 10px 0;
+}
+
+.dev-card p {
+  font-size: 16px;
+  color: #555;
+}
+
+.dev-card a {
+  text-decoration: none;
+  color: #000080;
+  font-weight: bold;
+}
+
+  </style>
+</head>
+
+<body style="margin-top: 80px">
+<br><br>
+    <header>
+        <h1>Student Dashboard</h1>
+        <div class="nav-buttons">
+          <button onclick="window.location.href='dashboard.html'">Home</button>
+          <button onclick="window.location.href='about.html'">About Us</button>
+          <button onclick="window.location.href='registered.html'">Registered Events</button>
+          <button onclick="logout()">Log Out</button>
+        </div>
+      </header>
+  <!-- About Us Content -->
+  <main style="padding: 40px;">
+    <h2>About Us</h2>
+    <p>Welcome to the Student Event Organizer Portal! Here, you can find various exciting events, register easily, and track all your event participations at one place.</p>
+    <p>Our mission is to keep students engaged, informed, and connected through interesting events and activities.</p>
+    <p>Stay tuned and never miss an opportunity!</p>
+  </main>
+  <br>
+  <!-- Developers Section -->
+  <div class="meet-developers">
+  <button class="meet-btn">Meet the Developers</button>
+  <div class="dev-dropdown">
+  <div class="dev-container">
+    <!-- Developer 1 -->
+    <div class="dev-card">
+      <h3>Bhavya Sree K</h3>
+      <p>
+        <a href="https://www.linkedin.com/in/bhavyasree09" target="_blank">LinkedIn</a> |
+        frontend & backend developer
+        ui/ux designer
+        test engineer
+      </p>
+    </div>
+
+</div>
+<script>
+const meetBtn = document.querySelector('.meet-btn');
+const devDropdown = document.querySelector('.dev-dropdown');
+
+meetBtn.addEventListener('click', () => {
+  devDropdown.style.display = devDropdown.style.display === 'block' ? 'none' : 'block';
+});
+</script>
+</body>
+</html>
