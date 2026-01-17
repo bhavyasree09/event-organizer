@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -9,9 +11,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-mongoose.connect('mongodb+srv://admin:eventorgdb123@event-org.qjb5u0b.mongodb.net/eventdb')
+mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB connected 🔥'))
   .catch(err => console.error('MongoDB error:', err));
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
 
 app.use('/api', authRoutes);
 app.use('/api', eventRoutes);
